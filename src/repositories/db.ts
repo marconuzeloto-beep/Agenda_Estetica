@@ -1,12 +1,15 @@
-import Dexie from 'dexie'
+import Dexie, { type Table } from 'dexie'
+import type { Appointment } from '@/features/agenda/types'
 
-/**
- * Instância base do banco local (IndexedDB).
- * Tabelas de domínio serão adicionadas nas próximas sprints via db.version(n).stores(...).
- */
 class AgendaEsteticaDB extends Dexie {
+  appointments!: Table<Appointment, string>
+
   constructor() {
     super('agenda-estetica')
+
+    this.version(1).stores({
+      appointments: 'id, start, end',
+    })
   }
 }
 

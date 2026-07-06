@@ -1,12 +1,8 @@
-import type { LucideIcon } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { cn } from '@/utils/cn'
+import type { NavItem } from './types'
 
-export interface NavItem {
-  to: string
-  label: string
-  icon: LucideIcon
-}
+export type { NavItem }
 
 export interface BottomNavProps {
   items: NavItem[]
