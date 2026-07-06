@@ -1,4 +1,4 @@
-import { CalendarDays, Home, Users } from 'lucide-react'
+import { CalendarDays, Home, Scissors, Users } from 'lucide-react'
 import { Outlet } from 'react-router-dom'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { Header } from '@/components/layout/Header'
@@ -8,6 +8,7 @@ const navItems: NavItem[] = [
   { to: '/', label: 'Início', icon: Home, end: true },
   { to: '/agenda', label: 'Agenda', icon: CalendarDays },
   { to: '/clientes', label: 'Clientes', icon: Users },
+  { to: '/procedimentos', label: 'Procedimentos', icon: Scissors },
 ]
 
 export function AppLayout() {

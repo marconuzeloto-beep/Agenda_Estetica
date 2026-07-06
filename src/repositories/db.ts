@@ -1,10 +1,12 @@
 import Dexie, { type Table } from 'dexie'
 import type { Appointment } from '@/features/agenda/types'
 import type { Client } from '@/features/clients/types'
+import type { Procedure } from '@/features/procedures/types'
 
 class AgendaEsteticaDB extends Dexie {
   appointments!: Table<Appointment, string>
   clients!: Table<Client, string>
+  procedures!: Table<Procedure, string>
 
   constructor() {
     super('agenda-estetica')
@@ -16,6 +18,12 @@ class AgendaEsteticaDB extends Dexie {
     this.version(2).stores({
       appointments: 'id, start, end, clientId',
       clients: 'id, name, phone',
+    })
+
+    this.version(3).stores({
+      appointments: 'id, start, end, clientId',
+      clients: 'id, name, phone',
+      procedures: 'id, name, category',
     })
   }
 }
