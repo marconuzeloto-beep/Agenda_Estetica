@@ -5,6 +5,7 @@ import { AgendaPage } from '@/pages/AgendaPage'
 import { ClientDetailPage } from '@/pages/ClientDetailPage'
 import { ClientsPage } from '@/pages/ClientsPage'
 import { DashboardPage } from '@/pages/DashboardPage'
+import { FinancePage } from '@/pages/FinancePage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 import { ProceduresPage } from '@/pages/ProceduresPage'
 
@@ -20,6 +21,7 @@ export const router = createBrowserRouter([
           { path: 'clientes', element: <ClientsPage /> },
           { path: 'clientes/:id', element: <ClientDetailPage /> },
           { path: 'procedimentos', element: <ProceduresPage /> },
+          { path: 'financeiro', element: <FinancePage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

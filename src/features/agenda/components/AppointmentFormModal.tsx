@@ -4,6 +4,8 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button, Dialog, Input, Select, Textarea } from '@/components/ui'
 import { useClients } from '@/features/clients/hooks/useClients'
+import { useProcedures } from '@/features/procedures/hooks/useProcedures'
+import { formatCurrency } from '@/utils/currency'
 import { toDateInputValue } from '@/utils/date'
 import { appointmentFormSchema, type AppointmentFormValues } from '../schemas'
 import type { Appointment } from '../types'
@@ -11,6 +13,7 @@ import type { Appointment } from '../types'
 const EMPTY_VALUES: AppointmentFormValues = {
   title: '',
   clientId: '',
+  procedureId: '',
   date: toDateInputValue(new Date()),
   startTime: '09:00',
   endTime: '10:00',
@@ -39,6 +42,7 @@ export function AppointmentFormModal({
   error,
 }: AppointmentFormModalProps) {
   const { data: clients = [] } = useClients()
+  const { data: procedures = [] } = useProcedures()
 
   const {
     register,
@@ -100,6 +104,14 @@ export function AppointmentFormModal({
           {clients.map((client) => (
             <option key={client.id} value={client.id}>
               {client.name}
+            </option>
+          ))}
+        </Select>
+        <Select label="Procedimento (opcional)" {...register('procedureId')}>
+          <option value="">Nenhum vínculo</option>
+          {procedures.map((procedure) => (
+            <option key={procedure.id} value={procedure.id}>
+              {procedure.name} — {formatCurrency(procedure.price)}
             </option>
           ))}
         </Select>

@@ -33,11 +33,11 @@ export function StatCard({
       >
         <Icon className="size-5" aria-hidden="true" />
       </div>
-      <div>
-        <p className="text-2xl font-semibold text-neutral-900 dark:text-neutral-50">
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-2xl font-semibold text-neutral-900 dark:text-neutral-50">
           {value}
         </p>
-        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+        <p className="truncate text-sm text-neutral-500 dark:text-neutral-400">
           {label}
         </p>
       </div>

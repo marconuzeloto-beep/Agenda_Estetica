@@ -4,6 +4,8 @@ export interface Appointment {
   title: string
   /** Vínculo opcional com um cliente cadastrado. */
   clientId?: string
+  /** Vínculo opcional com um procedimento do catálogo (usado no Financeiro). */
+  procedureId?: string
   start: Date
   end: Date
   notes?: string

@@ -25,6 +25,12 @@ class AgendaEsteticaDB extends Dexie {
       clients: 'id, name, phone',
       procedures: 'id, name, category',
     })
+
+    this.version(4).stores({
+      appointments: 'id, start, end, clientId, procedureId',
+      clients: 'id, name, phone',
+      procedures: 'id, name, category',
+    })
   }
 }
 

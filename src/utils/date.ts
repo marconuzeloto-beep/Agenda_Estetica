@@ -96,6 +96,9 @@ const monthYearFormatter = new Intl.DateTimeFormat('pt-BR', {
   month: 'long',
   year: 'numeric',
 })
+const monthShortFormatter = new Intl.DateTimeFormat('pt-BR', {
+  month: 'short',
+})
 const fullDateFormatter = new Intl.DateTimeFormat('pt-BR', {
   weekday: 'long',
   day: '2-digit',
@@ -120,6 +123,10 @@ export function formatDayMonth(date: Date): string {
 
 export function formatMonthYear(date: Date): string {
   return capitalize(monthYearFormatter.format(date))
+}
+
+export function formatMonthShort(date: Date): string {
+  return capitalize(monthShortFormatter.format(date).replace('.', ''))
 }
 
 export function formatFullDate(date: Date): string {

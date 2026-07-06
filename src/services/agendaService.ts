@@ -43,6 +43,7 @@ export const agendaService = {
       id: crypto.randomUUID(),
       title: values.title.trim(),
       clientId: values.clientId || undefined,
+      procedureId: values.procedureId || undefined,
       start,
       end,
       notes: values.notes?.trim() || undefined,
@@ -63,6 +64,7 @@ export const agendaService = {
     await appointmentsRepository.update(id, {
       title: values.title.trim(),
       clientId: values.clientId || undefined,
+      procedureId: values.procedureId || undefined,
       start,
       end,
       notes: values.notes?.trim() || undefined,

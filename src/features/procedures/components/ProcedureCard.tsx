@@ -1,6 +1,7 @@
 import { Pencil, Trash2 } from 'lucide-react'
 import { Card, IconButton } from '@/components/ui'
-import { formatCurrency, formatDuration } from '../utils'
+import { formatCurrency } from '@/utils/currency'
+import { formatDuration } from '../utils'
 import type { Procedure } from '../types'
 
 export interface ProcedureCardProps {

@@ -4,6 +4,7 @@ export const appointmentFormSchema = z
   .object({
     title: z.string().trim().min(1, 'Informe um serviço'),
     clientId: z.string().optional(),
+    procedureId: z.string().optional(),
     date: z.string().min(1, 'Informe a data'),
     startTime: z.string().min(1, 'Informe o horário de início'),
     endTime: z.string().min(1, 'Informe o horário de término'),
