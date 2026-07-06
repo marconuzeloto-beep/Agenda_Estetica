@@ -17,6 +17,20 @@ export const appointmentsRepository = {
     return appointments.sort((a, b) => b.start.getTime() - a.start.getTime())
   },
 
+  async findOverlapping(
+    start: Date,
+    end: Date,
+    excludeId?: string,
+  ): Promise<Appointment | undefined> {
+    const all = await db.appointments.toArray()
+    return all.find(
+      (appointment) =>
+        appointment.id !== excludeId &&
+        appointment.start < end &&
+        start < appointment.end,
+    )
+  },
+
   async create(appointment: Appointment): Promise<string> {
     return db.appointments.add(appointment)
   },

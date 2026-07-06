@@ -1,9 +1,27 @@
 import type { AppointmentFormValues } from '@/features/agenda/schemas'
 import type { Appointment } from '@/features/agenda/types'
 import { appointmentsRepository } from '@/repositories/appointmentsRepository'
+import { formatTime } from '@/utils/date'
 
 function combineDateAndTime(date: string, time: string): Date {
   return new Date(`${date}T${time}`)
+}
+
+async function assertNoConflict(
+  start: Date,
+  end: Date,
+  excludeId?: string,
+): Promise<void> {
+  const conflict = await appointmentsRepository.findOverlapping(
+    start,
+    end,
+    excludeId,
+  )
+  if (conflict) {
+    throw new Error(
+      `Conflito de horário com "${conflict.title}" (${formatTime(conflict.start)} – ${formatTime(conflict.end)})`,
+    )
+  }
 }
 
 export const agendaService = {
@@ -16,12 +34,17 @@ export const agendaService = {
   },
 
   async createAppointment(values: AppointmentFormValues): Promise<Appointment> {
+    const start = combineDateAndTime(values.date, values.startTime)
+    const end = combineDateAndTime(values.date, values.endTime)
+
+    await assertNoConflict(start, end)
+
     const appointment: Appointment = {
       id: crypto.randomUUID(),
       title: values.title.trim(),
       clientId: values.clientId || undefined,
-      start: combineDateAndTime(values.date, values.startTime),
-      end: combineDateAndTime(values.date, values.endTime),
+      start,
+      end,
       notes: values.notes?.trim() || undefined,
     }
     await appointmentsRepository.create(appointment)
@@ -32,11 +55,16 @@ export const agendaService = {
     id: string,
     values: AppointmentFormValues,
   ): Promise<void> {
+    const start = combineDateAndTime(values.date, values.startTime)
+    const end = combineDateAndTime(values.date, values.endTime)
+
+    await assertNoConflict(start, end, id)
+
     await appointmentsRepository.update(id, {
       title: values.title.trim(),
       clientId: values.clientId || undefined,
-      start: combineDateAndTime(values.date, values.startTime),
-      end: combineDateAndTime(values.date, values.endTime),
+      start,
+      end,
       notes: values.notes?.trim() || undefined,
     })
   },

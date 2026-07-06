@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Spinner } from '@/components/ui'
+import { AgendaFilters } from '@/features/agenda/components/AgendaFilters'
 import { AgendaToolbar } from '@/features/agenda/components/AgendaToolbar'
 import { AppointmentFormModal } from '@/features/agenda/components/AppointmentFormModal'
 import { MonthView } from '@/features/agenda/components/MonthView'
@@ -14,6 +15,7 @@ import { useAppointmentsRange } from '@/features/agenda/hooks/useAppointmentsRan
 import { appointmentToFormValues } from '@/features/agenda/mappers'
 import type { AppointmentFormValues } from '@/features/agenda/schemas'
 import type { AgendaView, Appointment } from '@/features/agenda/types'
+import { filterAppointments } from '@/features/agenda/utils'
 import {
   addDays,
   addMinutes,
@@ -46,8 +48,11 @@ export function AgendaPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const view = (searchParams.get('view') as AgendaView | null) ?? 'week'
   const currentDate = parseDateParam(searchParams.get('date'))
+  const clientFilter = searchParams.get('client') ?? ''
 
+  const [searchFilter, setSearchFilter] = useState('')
   const [modalState, setModalState] = useState<ModalState>(null)
+  const [submitError, setSubmitError] = useState<string>()
 
   const range = useMemo(() => {
     if (view === 'day') {
@@ -68,6 +73,15 @@ export function AgendaPage() {
     range.end,
   )
 
+  const filteredAppointments = useMemo(
+    () =>
+      filterAppointments(appointments, {
+        clientId: clientFilter || undefined,
+        search: searchFilter,
+      }),
+    [appointments, clientFilter, searchFilter],
+  )
+
   const createMutation = useCreateAppointment()
   const updateMutation = useUpdateAppointment()
   const deleteMutation = useDeleteAppointment()
@@ -76,6 +90,13 @@ export function AgendaPage() {
     const params = new URLSearchParams(searchParams)
     if (next.view) params.set('view', next.view)
     if (next.date) params.set('date', toDateInputValue(next.date))
+    setSearchParams(params, { replace: true })
+  }
+
+  function handleClientFilterChange(nextClientId: string) {
+    const params = new URLSearchParams(searchParams)
+    if (nextClientId) params.set('client', nextClientId)
+    else params.delete('client')
     setSearchParams(params, { replace: true })
   }
 
@@ -99,8 +120,13 @@ export function AgendaPage() {
     updateParams({ view: nextView })
   }
 
+  function openModal(state: ModalState) {
+    setSubmitError(undefined)
+    setModalState(state)
+  }
+
   function handleSlotClick(date: Date) {
-    setModalState({
+    openModal({
       mode: 'create',
       initialValues: {
         date: toDateInputValue(date),
@@ -115,7 +141,7 @@ export function AgendaPage() {
   }
 
   function handleAppointmentClick(appointment: Appointment) {
-    setModalState({ mode: 'edit', appointment })
+    openModal({ mode: 'edit', appointment })
   }
 
   function handleCreateClick() {
@@ -124,16 +150,24 @@ export function AgendaPage() {
 
   function closeModal() {
     setModalState(null)
+    setSubmitError(undefined)
   }
 
   function handleSubmit(values: AppointmentFormValues) {
+    setSubmitError(undefined)
     if (modalState?.mode === 'edit') {
       updateMutation.mutate(
         { id: modalState.appointment.id, values },
-        { onSuccess: closeModal },
+        {
+          onSuccess: closeModal,
+          onError: (error) => setSubmitError(error.message),
+        },
       )
     } else {
-      createMutation.mutate(values, { onSuccess: closeModal })
+      createMutation.mutate(values, {
+        onSuccess: closeModal,
+        onError: (error) => setSubmitError(error.message),
+      })
     }
   }
 
@@ -164,6 +198,13 @@ export function AgendaPage() {
         onCreate={handleCreateClick}
       />
 
+      <AgendaFilters
+        clientId={clientFilter}
+        onClientChange={handleClientFilterChange}
+        search={searchFilter}
+        onSearchChange={setSearchFilter}
+      />
+
       {isLoading ? (
         <div className="flex justify-center py-10">
           <Spinner label="Carregando agenda" />
@@ -171,14 +212,14 @@ export function AgendaPage() {
       ) : view === 'month' ? (
         <MonthView
           month={currentDate}
-          appointments={appointments}
+          appointments={filteredAppointments}
           onDayClick={handleDayClick}
           onAppointmentClick={handleAppointmentClick}
         />
       ) : (
         <TimeGridView
           days={view === 'day' ? [currentDate] : getWeekDays(currentDate)}
-          appointments={appointments}
+          appointments={filteredAppointments}
           onSlotClick={handleSlotClick}
           onAppointmentClick={handleAppointmentClick}
         />
@@ -200,6 +241,7 @@ export function AgendaPage() {
         onSubmit={handleSubmit}
         onDelete={modalState?.mode === 'edit' ? handleDelete : undefined}
         isSubmitting={createMutation.isPending || updateMutation.isPending}
+        error={submitError}
       />
     </div>
   )

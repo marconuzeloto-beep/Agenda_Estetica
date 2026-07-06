@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash2 } from 'lucide-react'
+import { TriangleAlert, Trash2 } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button, Dialog, Input, Select, Textarea } from '@/components/ui'
@@ -25,6 +25,7 @@ export interface AppointmentFormModalProps {
   onSubmit: (values: AppointmentFormValues) => void
   onDelete?: () => void
   isSubmitting?: boolean
+  error?: string
 }
 
 export function AppointmentFormModal({
@@ -35,6 +36,7 @@ export function AppointmentFormModal({
   onSubmit,
   onDelete,
   isSubmitting,
+  error,
 }: AppointmentFormModalProps) {
   const { data: clients = [] } = useClients()
 
@@ -75,6 +77,18 @@ export function AppointmentFormModal({
         onSubmit={handleSubmit((values) => onSubmit(values))}
         className="flex flex-col gap-4"
       >
+        {error && (
+          <div
+            role="alert"
+            className="bg-danger-500/10 text-danger-500 flex items-start gap-2 rounded-md px-3 py-2 text-sm"
+          >
+            <TriangleAlert
+              className="mt-0.5 size-4 flex-none"
+              aria-hidden="true"
+            />
+            {error}
+          </div>
+        )}
         <Input
           label="Serviço"
           placeholder="Ex.: Limpeza de pele"
