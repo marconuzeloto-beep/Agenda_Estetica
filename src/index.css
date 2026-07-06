@@ -1,0 +1,67 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Marca — tons rosados quentes, remetem a cuidado e estética */
+  --color-brand-50: #fef6f5;
+  --color-brand-100: #fdeae9;
+  --color-brand-200: #fad2d1;
+  --color-brand-300: #f5aeae;
+  --color-brand-400: #ed7f82;
+  --color-brand-500: #e15a63;
+  --color-brand-600: #cc3c4c;
+  --color-brand-700: #ab2d3f;
+  --color-brand-800: #8d283a;
+  --color-brand-900: #772637;
+
+  /* Neutros quentes para fundos e texto */
+  --color-neutral-50: #fdfaf9;
+  --color-neutral-100: #f7f1ef;
+  --color-neutral-200: #ede3e0;
+  --color-neutral-300: #ddccc7;
+  --color-neutral-400: #b7a29c;
+  --color-neutral-500: #8f7b76;
+  --color-neutral-600: #6d5b57;
+  --color-neutral-700: #52413e;
+  --color-neutral-800: #362a28;
+  --color-neutral-900: #211918;
+
+  --color-success-500: #4caf7d;
+  --color-warning-500: #e0a53c;
+  --color-danger-500: #d84c4c;
+
+  --font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Poppins', var(--font-sans);
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  --shadow-soft:
+    0 2px 8px rgba(54, 42, 40, 0.06), 0 1px 2px rgba(54, 42, 40, 0.04);
+  --shadow-elevated:
+    0 8px 24px rgba(54, 42, 40, 0.1), 0 2px 6px rgba(54, 42, 40, 0.06);
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-neutral-50 text-neutral-800 antialiased dark:bg-neutral-900 dark:text-neutral-100;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  #root {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+  }
+}
