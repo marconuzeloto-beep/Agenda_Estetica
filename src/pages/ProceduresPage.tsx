@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion'
 import { Plus, Scissors } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Button, Spinner, Tabs } from '@/components/ui'
+import { PageTransition } from '@/components/layout/PageTransition'
 import { ProcedureCard } from '@/features/procedures/components/ProcedureCard'
 import { ProcedureFormModal } from '@/features/procedures/components/ProcedureFormModal'
 import {
@@ -81,12 +81,7 @@ export function ProceduresPage() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="mx-auto flex max-w-2xl flex-col gap-4"
-    >
+    <PageTransition>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-xl font-semibold text-neutral-900 dark:text-neutral-50">
@@ -144,6 +139,6 @@ export function ProceduresPage() {
         onSubmit={handleSubmit}
         isSubmitting={createMutation.isPending || updateMutation.isPending}
       />
-    </motion.div>
+    </PageTransition>
   )
 }

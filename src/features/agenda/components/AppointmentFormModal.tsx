@@ -84,7 +84,7 @@ export function AppointmentFormModal({
         {error && (
           <div
             role="alert"
-            className="bg-danger-500/10 text-danger-500 flex items-start gap-2 rounded-md px-3 py-2 text-sm"
+            className="bg-danger-500/10 text-danger-600 dark:text-danger-400 flex items-start gap-2 rounded-md px-3 py-2 text-sm"
           >
             <TriangleAlert
               className="mt-0.5 size-4 flex-none"
@@ -148,7 +148,7 @@ export function AppointmentFormModal({
               type="button"
               variant="ghost"
               onClick={handleDeleteClick}
-              className="text-danger-500"
+              className="text-danger-600 dark:text-danger-400"
             >
               <Trash2 className="size-4" aria-hidden="true" />
               Excluir

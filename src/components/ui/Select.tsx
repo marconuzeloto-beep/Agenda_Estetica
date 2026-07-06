@@ -43,7 +43,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             aria-hidden="true"
           />
         </div>
-        {error && <p className="text-danger-500 text-sm">{error}</p>}
+        {error && (
+          <p className="text-danger-600 dark:text-danger-400 text-sm">
+            {error}
+          </p>
+        )}
       </div>
     )
   },

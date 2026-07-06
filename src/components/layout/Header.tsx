@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { IconButton } from '@/components/ui'
 import { useTheme } from '@/hooks/useTheme'
 import { cn } from '@/utils/cn'
+import { InstallPwaButton } from './InstallPwaButton'
 import type { NavItem } from './types'
 
 export interface HeaderProps {
@@ -46,18 +47,21 @@ export function Header({ navItems }: HeaderProps) {
         </nav>
       </div>
 
-      <IconButton
-        aria-label={
-          theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'
-        }
-        onClick={toggleTheme}
-      >
-        {theme === 'dark' ? (
-          <Sun className="size-5" aria-hidden="true" />
-        ) : (
-          <Moon className="size-5" aria-hidden="true" />
-        )}
-      </IconButton>
+      <div className="flex items-center gap-2">
+        <InstallPwaButton />
+        <IconButton
+          aria-label={
+            theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'
+          }
+          onClick={toggleTheme}
+        >
+          {theme === 'dark' ? (
+            <Sun className="size-5" aria-hidden="true" />
+          ) : (
+            <Moon className="size-5" aria-hidden="true" />
+          )}
+        </IconButton>
+      </div>
     </header>
   )
 }

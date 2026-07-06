@@ -81,10 +81,21 @@ export function TimeGridView({
               }}
             >
               {hours.map((hour) => (
-                <div
+                <button
                   key={hour}
+                  type="button"
+                  onClick={(event) => {
+                    // Real mouse clicks have detail >= 1; keyboard/AT activation has detail 0.
+                    // Let mouse clicks bubble to the parent's precise (15-min) handler.
+                    if (event.detail !== 0) return
+                    event.stopPropagation()
+                    const clicked = new Date(day)
+                    clicked.setHours(hour, 0, 0, 0)
+                    onSlotClick(clicked)
+                  }}
+                  aria-label={`Novo agendamento às ${String(hour).padStart(2, '0')}:00 em ${formatWeekdayShort(day)}`}
                   style={{ height: HOUR_HEIGHT }}
-                  className="border-b border-neutral-100 dark:border-neutral-800/60"
+                  className="focus-visible:ring-brand-400 block w-full border-b border-neutral-100 text-left focus-visible:z-10 focus-visible:ring-2 focus-visible:outline-none dark:border-neutral-800/60"
                 />
               ))}
 

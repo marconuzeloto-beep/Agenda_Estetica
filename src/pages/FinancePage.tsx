@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { DollarSign, Receipt, TrendingUp, Wallet } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import {
@@ -9,6 +8,7 @@ import {
   StatCard,
   Tabs,
 } from '@/components/ui'
+import { PageTransition } from '@/components/layout/PageTransition'
 import { RevenueChart } from '@/features/finance/components/RevenueChart'
 import { useFinanceData } from '@/features/finance/hooks/useFinanceData'
 import {
@@ -68,12 +68,7 @@ export function FinancePage() {
   }, [granularity, appointments, priceByProcedureId, now])
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="mx-auto flex max-w-2xl flex-col gap-4"
-    >
+    <PageTransition>
       <div>
         <h1 className="font-display text-xl font-semibold text-neutral-900 dark:text-neutral-50">
           Financeiro
@@ -128,6 +123,6 @@ export function FinancePage() {
           </Card>
         </>
       )}
-    </motion.div>
+    </PageTransition>
   )
 }

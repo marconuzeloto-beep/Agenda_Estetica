@@ -28,8 +28,13 @@
   --color-neutral-900: #211918;
 
   --color-success-500: #4caf7d;
+  --color-success-600: #278055;
+  --color-warning-400: #f0c168;
   --color-warning-500: #e0a53c;
+  --color-warning-600: #96690a;
+  --color-danger-400: #e88a8a;
   --color-danger-500: #d84c4c;
+  --color-danger-600: #b83b3b;
 
   --font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Poppins', var(--font-sans);

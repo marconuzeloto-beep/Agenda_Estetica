@@ -23,7 +23,7 @@ export function BottomNav({ items }: BottomNavProps) {
               className={({ isActive }) =>
                 cn(
                   'flex flex-col items-center gap-1 py-2 text-xs font-medium text-neutral-500 transition-colors dark:text-neutral-400',
-                  isActive && 'text-brand-500 dark:text-brand-400',
+                  isActive && 'text-brand-600 dark:text-brand-400',
                 )
               }
             >

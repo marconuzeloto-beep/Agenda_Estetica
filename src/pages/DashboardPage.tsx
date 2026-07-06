@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion'
 import { CalendarCheck, CalendarDays, Clock, Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Spinner, StatCard } from '@/components/ui'
+import { PageTransition } from '@/components/layout/PageTransition'
 import { UpcomingAppointmentsCard } from '@/features/dashboard/components/UpcomingAppointmentsCard'
 import { useDashboardStats } from '@/features/dashboard/hooks/useDashboardStats'
 import { formatTime } from '@/utils/date'
@@ -11,12 +11,7 @@ export function DashboardPage() {
     useDashboardStats()
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="mx-auto flex max-w-2xl flex-col gap-4"
-    >
+    <PageTransition>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-xl font-semibold text-neutral-900 dark:text-neutral-50">
@@ -58,6 +53,6 @@ export function DashboardPage() {
       ) : (
         <UpcomingAppointmentsCard appointments={upcoming} />
       )}
-    </motion.div>
+    </PageTransition>
   )
 }
