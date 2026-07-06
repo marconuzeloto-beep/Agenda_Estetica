@@ -15,11 +15,11 @@ export function BottomNav({ items }: BottomNavProps) {
       className="sticky bottom-0 z-20 border-t border-neutral-200 bg-white/90 backdrop-blur-sm sm:hidden dark:border-neutral-800 dark:bg-neutral-900/90"
     >
       <ul className="flex items-stretch justify-around">
-        {items.map(({ to, label, icon: Icon }) => (
+        {items.map(({ to, label, icon: Icon, end }) => (
           <li key={to} className="flex-1">
             <NavLink
               to={to}
-              end
+              end={end}
               className={({ isActive }) =>
                 cn(
                   'flex flex-col items-center gap-1 py-2 text-xs font-medium text-neutral-500 transition-colors dark:text-neutral-400',

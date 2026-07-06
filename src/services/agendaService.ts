@@ -11,10 +11,15 @@ export const agendaService = {
     return appointmentsRepository.listByRange(start, end)
   },
 
+  getAppointmentsByClient(clientId: string): Promise<Appointment[]> {
+    return appointmentsRepository.listByClient(clientId)
+  },
+
   async createAppointment(values: AppointmentFormValues): Promise<Appointment> {
     const appointment: Appointment = {
       id: crypto.randomUUID(),
       title: values.title.trim(),
+      clientId: values.clientId || undefined,
       start: combineDateAndTime(values.date, values.startTime),
       end: combineDateAndTime(values.date, values.endTime),
       notes: values.notes?.trim() || undefined,
@@ -29,6 +34,7 @@ export const agendaService = {
   ): Promise<void> {
     await appointmentsRepository.update(id, {
       title: values.title.trim(),
+      clientId: values.clientId || undefined,
       start: combineDateAndTime(values.date, values.startTime),
       end: combineDateAndTime(values.date, values.endTime),
       notes: values.notes?.trim() || undefined,

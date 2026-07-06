@@ -26,11 +26,11 @@ export function Header({ navItems }: HeaderProps) {
           aria-label="Navegação principal"
           className="hidden items-center gap-1 sm:flex"
         >
-          {navItems.map(({ to, label, icon: Icon }) => (
+          {navItems.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
               to={to}
-              end
+              end={end}
               className={({ isActive }) =>
                 cn(
                   'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-neutral-500 transition-colors hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-100',

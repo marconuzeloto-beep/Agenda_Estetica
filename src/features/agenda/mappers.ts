@@ -7,6 +7,7 @@ export function appointmentToFormValues(
 ): AppointmentFormValues {
   return {
     title: appointment.title,
+    clientId: appointment.clientId ?? '',
     date: toDateInputValue(appointment.start),
     startTime: toTimeInputValue(appointment.start),
     endTime: toTimeInputValue(appointment.end),

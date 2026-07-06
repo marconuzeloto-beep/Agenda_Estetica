@@ -9,6 +9,14 @@ export const appointmentsRepository = {
     )
   },
 
+  async listByClient(clientId: string): Promise<Appointment[]> {
+    const appointments = await db.appointments
+      .where('clientId')
+      .equals(clientId)
+      .toArray()
+    return appointments.sort((a, b) => b.start.getTime() - a.start.getTime())
+  },
+
   async create(appointment: Appointment): Promise<string> {
     return db.appointments.add(appointment)
   },
@@ -19,5 +27,12 @@ export const appointmentsRepository = {
 
   async remove(id: string): Promise<void> {
     await db.appointments.delete(id)
+  },
+
+  async clearClientReference(clientId: string): Promise<void> {
+    await db.appointments
+      .where('clientId')
+      .equals(clientId)
+      .modify({ clientId: undefined })
   },
 }

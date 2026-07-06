@@ -2,13 +2,15 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash2 } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { Button, Dialog, Input, Textarea } from '@/components/ui'
+import { Button, Dialog, Input, Select, Textarea } from '@/components/ui'
+import { useClients } from '@/features/clients/hooks/useClients'
 import { toDateInputValue } from '@/utils/date'
 import { appointmentFormSchema, type AppointmentFormValues } from '../schemas'
 import type { Appointment } from '../types'
 
 const EMPTY_VALUES: AppointmentFormValues = {
   title: '',
+  clientId: '',
   date: toDateInputValue(new Date()),
   startTime: '09:00',
   endTime: '10:00',
@@ -34,6 +36,8 @@ export function AppointmentFormModal({
   onDelete,
   isSubmitting,
 }: AppointmentFormModalProps) {
+  const { data: clients = [] } = useClients()
+
   const {
     register,
     handleSubmit,
@@ -51,6 +55,16 @@ export function AppointmentFormModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
+  function handleDeleteClick() {
+    if (
+      window.confirm(
+        'Excluir este agendamento? Essa ação não pode ser desfeita.',
+      )
+    ) {
+      onDelete?.()
+    }
+  }
+
   return (
     <Dialog
       open={open}
@@ -62,11 +76,19 @@ export function AppointmentFormModal({
         className="flex flex-col gap-4"
       >
         <Input
-          label="Título"
+          label="Serviço"
           placeholder="Ex.: Limpeza de pele"
           error={errors.title?.message}
           {...register('title')}
         />
+        <Select label="Cliente (opcional)" {...register('clientId')}>
+          <option value="">Nenhum vínculo</option>
+          {clients.map((client) => (
+            <option key={client.id} value={client.id}>
+              {client.name}
+            </option>
+          ))}
+        </Select>
         <Input
           label="Data"
           type="date"
@@ -99,7 +121,7 @@ export function AppointmentFormModal({
             <Button
               type="button"
               variant="ghost"
-              onClick={onDelete}
+              onClick={handleDeleteClick}
               className="text-danger-500"
             >
               <Trash2 className="size-4" aria-hidden="true" />
