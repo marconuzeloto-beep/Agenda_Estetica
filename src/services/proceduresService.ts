@@ -1,5 +1,6 @@
 import type { ProcedureFormValues } from '@/features/procedures/schemas'
 import type { Procedure } from '@/features/procedures/types'
+import { appointmentsRepository } from '@/repositories/appointmentsRepository'
 import { proceduresRepository } from '@/repositories/proceduresRepository'
 
 export const proceduresService = {
@@ -25,16 +26,20 @@ export const proceduresService = {
     id: string,
     values: ProcedureFormValues,
   ): Promise<void> {
-    await proceduresRepository.update(id, {
+    const updated = await proceduresRepository.update(id, {
       name: values.name.trim(),
       category: values.category.trim(),
       durationMinutes: values.durationMinutes,
       price: values.price,
       notes: values.notes?.trim() || undefined,
     })
+    if (updated === 0) {
+      throw new Error('Procedimento não encontrado.')
+    }
   },
 
-  deleteProcedure(id: string): Promise<void> {
-    return proceduresRepository.remove(id)
+  async deleteProcedure(id: string): Promise<void> {
+    await appointmentsRepository.clearProcedureReference(id)
+    await proceduresRepository.remove(id)
   },
 }

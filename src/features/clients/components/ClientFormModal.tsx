@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
+import { TriangleAlert } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { Button, Dialog, Input, Textarea } from '@/components/ui'
+import { useResetFormOnOpen } from '@/hooks/useResetFormOnOpen'
 import { clientToFormValues } from '../mappers'
 import { clientFormSchema, type ClientFormValues } from '../schemas'
 import type { Client } from '../types'
@@ -20,6 +21,7 @@ export interface ClientFormModalProps {
   client?: Client
   onSubmit: (values: ClientFormValues) => void
   isSubmitting?: boolean
+  error?: string
 }
 
 export function ClientFormModal({
@@ -28,6 +30,7 @@ export function ClientFormModal({
   client,
   onSubmit,
   isSubmitting,
+  error,
 }: ClientFormModalProps) {
   const {
     register,
@@ -39,12 +42,11 @@ export function ClientFormModal({
     defaultValues: EMPTY_VALUES,
   })
 
-  useEffect(() => {
-    if (open) {
-      reset(client ? clientToFormValues(client) : EMPTY_VALUES)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, client])
+  useResetFormOnOpen(
+    open,
+    reset,
+    client ? clientToFormValues(client) : EMPTY_VALUES,
+  )
 
   return (
     <Dialog
@@ -56,6 +58,18 @@ export function ClientFormModal({
         onSubmit={handleSubmit((values) => onSubmit(values))}
         className="flex flex-col gap-4"
       >
+        {error && (
+          <div
+            role="alert"
+            className="bg-danger-500/10 text-danger-600 dark:text-danger-400 flex items-start gap-2 rounded-md px-3 py-2 text-sm"
+          >
+            <TriangleAlert
+              className="mt-0.5 size-4 flex-none"
+              aria-hidden="true"
+            />
+            {error}
+          </div>
+        )}
         <Input
           label="Nome completo"
           placeholder="Ex.: Maria Silva"

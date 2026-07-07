@@ -61,7 +61,7 @@ export const agendaService = {
 
     await assertNoConflict(start, end, id)
 
-    await appointmentsRepository.update(id, {
+    const updated = await appointmentsRepository.update(id, {
       title: values.title.trim(),
       clientId: values.clientId || undefined,
       procedureId: values.procedureId || undefined,
@@ -69,6 +69,9 @@ export const agendaService = {
       end,
       notes: values.notes?.trim() || undefined,
     })
+    if (updated === 0) {
+      throw new Error('Agendamento não encontrado.')
+    }
   },
 
   deleteAppointment(id: string): Promise<void> {

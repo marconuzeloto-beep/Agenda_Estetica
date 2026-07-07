@@ -49,4 +49,11 @@ export const appointmentsRepository = {
       .equals(clientId)
       .modify({ clientId: undefined })
   },
+
+  async clearProcedureReference(procedureId: string): Promise<void> {
+    await db.appointments
+      .where('procedureId')
+      .equals(procedureId)
+      .modify({ procedureId: undefined })
+  },
 }

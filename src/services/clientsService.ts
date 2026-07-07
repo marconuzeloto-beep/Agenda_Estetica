@@ -27,13 +27,16 @@ export const clientsService = {
   },
 
   async updateClient(id: string, values: ClientFormValues): Promise<void> {
-    await clientsRepository.update(id, {
+    const updated = await clientsRepository.update(id, {
       name: values.name.trim(),
       phone: values.phone.trim(),
       email: values.email?.trim() || undefined,
       birthDate: values.birthDate || undefined,
       notes: values.notes?.trim() || undefined,
     })
+    if (updated === 0) {
+      throw new Error('Cliente não encontrado.')
+    }
   },
 
   async deleteClient(id: string): Promise<void> {

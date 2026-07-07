@@ -26,7 +26,9 @@ export function useDeleteProcedure() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => proceduresService.deleteProcedure(id),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['procedures'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['procedures'] })
+      queryClient.invalidateQueries({ queryKey: ['appointments'] })
+    },
   })
 }

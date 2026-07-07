@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
 import { useAppointmentsRange } from '@/features/agenda/hooks/useAppointmentsRange'
-import { endOfDay, endOfWeek, startOfDay } from '@/utils/date'
+import { endOfDay, endOfWeek, startOfDay, startOfWeek } from '@/utils/date'
 
 export function useDashboardStats() {
   const now = new Date()
-  const rangeStart = startOfDay(now)
+  const rangeStart = startOfWeek(now)
   const rangeEnd = endOfWeek(now)
 
   const { data: appointments = [], isLoading } = useAppointmentsRange(
@@ -13,10 +13,11 @@ export function useDashboardStats() {
   )
 
   const stats = useMemo(() => {
+    const todayStart = startOfDay(now)
     const todayEnd = endOfDay(now)
     const todayCount = appointments.filter(
       (appointment) =>
-        appointment.start >= rangeStart && appointment.start <= todayEnd,
+        appointment.start >= todayStart && appointment.start <= todayEnd,
     ).length
 
     const upcoming = appointments

@@ -25,8 +25,18 @@ export function addMinutes(date: Date, amount: number): Date {
 }
 
 export function addMonths(date: Date, amount: number): Date {
+  const day = date.getDate()
   const result = new Date(date)
+  // Move to day 1 first so setMonth can't overflow into the next month
+  // (e.g. Jan 31 -1 month would otherwise land on Mar 3, not Feb 28).
+  result.setDate(1)
   result.setMonth(result.getMonth() + amount)
+  const daysInTargetMonth = new Date(
+    result.getFullYear(),
+    result.getMonth() + 1,
+    0,
+  ).getDate()
+  result.setDate(Math.min(day, daysInTargetMonth))
   return result
 }
 

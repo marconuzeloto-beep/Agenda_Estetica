@@ -13,6 +13,7 @@ export function ClientsPage() {
   const { data: clients = [], isLoading } = useClients()
   const [query, setQuery] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
+  const [submitError, setSubmitError] = useState<string>()
   const createMutation = useCreateClient()
 
   const filtered = useMemo(
@@ -20,8 +21,22 @@ export function ClientsPage() {
     [clients, query],
   )
 
+  function openCreateModal() {
+    setSubmitError(undefined)
+    setModalOpen(true)
+  }
+
+  function closeModal() {
+    setModalOpen(false)
+    setSubmitError(undefined)
+  }
+
   function handleCreate(values: ClientFormValues) {
-    createMutation.mutate(values, { onSuccess: () => setModalOpen(false) })
+    setSubmitError(undefined)
+    createMutation.mutate(values, {
+      onSuccess: closeModal,
+      onError: (error) => setSubmitError(error.message),
+    })
   }
 
   return (
@@ -35,7 +50,7 @@ export function ClientsPage() {
             {clients.length} cadastrado{clients.length === 1 ? '' : 's'}
           </p>
         </div>
-        <Button size="sm" onClick={() => setModalOpen(true)}>
+        <Button size="sm" onClick={openCreateModal}>
           <Plus className="size-4" aria-hidden="true" />
           Novo cliente
         </Button>
@@ -78,9 +93,10 @@ export function ClientsPage() {
 
       <ClientFormModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={closeModal}
         onSubmit={handleCreate}
         isSubmitting={createMutation.isPending}
+        error={submitError}
       />
     </PageTransition>
   )

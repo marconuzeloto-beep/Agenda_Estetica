@@ -6,7 +6,6 @@ import {
   endOfDay,
   endOfMonth,
   endOfWeek,
-  isSameDay,
   startOfDay,
   startOfMonth,
   startOfWeek,
@@ -75,6 +74,24 @@ export function getFinanceSummary(
   }
 }
 
+function buildRevenueSeries(
+  appointments: Appointment[],
+  priceByProcedureId: Map<string, number>,
+  count: number,
+  getBucket: (offset: number) => { bucketStart: Date; start: Date; end: Date },
+): { bucketStart: Date; total: number }[] {
+  return Array.from({ length: count }, (_, index) => {
+    const { bucketStart, start, end } = getBucket(index - (count - 1))
+    const bucketAppointments = appointments.filter(
+      (appointment) => appointment.start >= start && appointment.start <= end,
+    )
+    return {
+      bucketStart,
+      total: sumRevenue(bucketAppointments, priceByProcedureId),
+    }
+  })
+}
+
 export function getDailyRevenueSeries(
   appointments: Appointment[],
   priceByProcedureId: Map<string, number>,
@@ -82,13 +99,10 @@ export function getDailyRevenueSeries(
   days = 7,
 ): { date: Date; total: number }[] {
   const today = startOfDay(referenceDate)
-  return Array.from({ length: days }, (_, index) => {
-    const date = addDays(today, index - (days - 1))
-    const dayAppointments = appointments.filter((appointment) =>
-      isSameDay(appointment.start, date),
-    )
-    return { date, total: sumRevenue(dayAppointments, priceByProcedureId) }
-  })
+  return buildRevenueSeries(appointments, priceByProcedureId, days, (offset) => {
+    const date = addDays(today, offset)
+    return { bucketStart: date, start: date, end: endOfDay(date) }
+  }).map(({ bucketStart, total }) => ({ date: bucketStart, total }))
 }
 
 export function getWeeklyRevenueSeries(
@@ -98,18 +112,19 @@ export function getWeeklyRevenueSeries(
   weeks = 6,
 ): { weekStart: Date; total: number }[] {
   const currentWeekStart = startOfWeek(referenceDate)
-  return Array.from({ length: weeks }, (_, index) => {
-    const weekStart = addDays(currentWeekStart, (index - (weeks - 1)) * 7)
-    const weekEnd = endOfDay(addDays(weekStart, 6))
-    const weekAppointments = appointments.filter(
-      (appointment) =>
-        appointment.start >= weekStart && appointment.start <= weekEnd,
-    )
-    return {
-      weekStart,
-      total: sumRevenue(weekAppointments, priceByProcedureId),
-    }
-  })
+  return buildRevenueSeries(
+    appointments,
+    priceByProcedureId,
+    weeks,
+    (offset) => {
+      const weekStart = addDays(currentWeekStart, offset * 7)
+      return {
+        bucketStart: weekStart,
+        start: weekStart,
+        end: endOfDay(addDays(weekStart, 6)),
+      }
+    },
+  ).map(({ bucketStart, total }) => ({ weekStart: bucketStart, total }))
 }
 
 export function getMonthlyRevenueSeries(
@@ -118,18 +133,17 @@ export function getMonthlyRevenueSeries(
   referenceDate: Date,
   months = 6,
 ): { monthStart: Date; total: number }[] {
-  return Array.from({ length: months }, (_, index) => {
-    const monthStart = startOfMonth(
-      addMonths(referenceDate, index - (months - 1)),
-    )
-    const monthEnd = endOfMonth(monthStart)
-    const monthAppointments = appointments.filter(
-      (appointment) =>
-        appointment.start >= monthStart && appointment.start <= monthEnd,
-    )
-    return {
-      monthStart,
-      total: sumRevenue(monthAppointments, priceByProcedureId),
-    }
-  })
+  return buildRevenueSeries(
+    appointments,
+    priceByProcedureId,
+    months,
+    (offset) => {
+      const monthStart = startOfMonth(addMonths(referenceDate, offset))
+      return {
+        bucketStart: monthStart,
+        start: monthStart,
+        end: endOfMonth(monthStart),
+      }
+    },
+  ).map(({ bucketStart, total }) => ({ monthStart: bucketStart, total }))
 }

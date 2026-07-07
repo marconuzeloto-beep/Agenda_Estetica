@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TriangleAlert, Trash2 } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button, Dialog, Input, Select, Textarea } from '@/components/ui'
 import { useClients } from '@/features/clients/hooks/useClients'
@@ -54,22 +54,23 @@ export function AppointmentFormModal({
     defaultValues: { ...EMPTY_VALUES, ...initialValues },
   })
 
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [prevOpen, setPrevOpen] = useState(open)
+
+  // Reset the delete-confirmation step when the dialog transitions closed -> open.
+  // Adjusted during render (not in an effect) per React's guidance for resetting
+  // state in response to a prop change.
+  if (open !== prevOpen) {
+    setPrevOpen(open)
+    if (open) setConfirmingDelete(false)
+  }
+
   useEffect(() => {
     if (open) {
       reset({ ...EMPTY_VALUES, ...initialValues })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
-
-  function handleDeleteClick() {
-    if (
-      window.confirm(
-        'Excluir este agendamento? Essa ação não pode ser desfeita.',
-      )
-    ) {
-      onDelete?.()
-    }
-  }
 
   return (
     <Dialog
@@ -144,15 +145,33 @@ export function AppointmentFormModal({
 
         <div className="mt-2 flex items-center justify-between gap-2">
           {appointment && onDelete ? (
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={handleDeleteClick}
-              className="text-danger-600 dark:text-danger-400"
-            >
-              <Trash2 className="size-4" aria-hidden="true" />
-              Excluir
-            </Button>
+            confirmingDelete ? (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-neutral-600 dark:text-neutral-400">
+                  Confirmar exclusão?
+                </span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setConfirmingDelete(false)}
+                >
+                  Não
+                </Button>
+                <Button type="button" variant="danger" onClick={onDelete}>
+                  Sim, excluir
+                </Button>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setConfirmingDelete(true)}
+                className="text-danger-600 dark:text-danger-400"
+              >
+                <Trash2 className="size-4" aria-hidden="true" />
+                Excluir
+              </Button>
+            )
           ) : (
             <span />
           )}

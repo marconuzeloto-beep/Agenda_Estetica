@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Card, IconButton, Spinner } from '@/components/ui'
+import { Card, ConfirmDialog, IconButton, Spinner } from '@/components/ui'
 import { AppointmentRow } from '@/features/agenda/components/AppointmentRow'
 import { useAppointmentsByClient } from '@/features/agenda/hooks/useAppointmentsByClient'
 import { ClientFormModal } from '@/features/clients/components/ClientFormModal'
@@ -28,6 +28,9 @@ export function ClientDetailPage() {
   const { data: client, isLoading } = useClient(id)
   const { data: appointments = [] } = useAppointmentsByClient(id)
   const [modalOpen, setModalOpen] = useState(false)
+  const [submitError, setSubmitError] = useState<string>()
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
+  const [deleteError, setDeleteError] = useState<string>()
 
   const updateMutation = useUpdateClient()
   const deleteMutation = useDeleteClient()
@@ -56,30 +59,48 @@ export function ClientDetailPage() {
     )
   }
 
+  function openEditModal() {
+    setSubmitError(undefined)
+    setModalOpen(true)
+  }
+
+  function closeEditModal() {
+    setModalOpen(false)
+    setSubmitError(undefined)
+  }
+
   function handleUpdate(values: ClientFormValues) {
+    setSubmitError(undefined)
     updateMutation.mutate(
       { id: client!.id, values },
-      { onSuccess: () => setModalOpen(false) },
+      {
+        onSuccess: closeEditModal,
+        onError: (error) => setSubmitError(error.message),
+      },
     )
   }
 
-  function handleDelete() {
-    if (
-      !window.confirm(
-        `Excluir o cliente ${client!.name}? Essa ação não pode ser desfeita.`,
-      )
-    ) {
-      return
-    }
+  function handleDeleteClick() {
+    setDeleteError(undefined)
+    setConfirmDeleteOpen(true)
+  }
+
+  function handleCancelDelete() {
+    setConfirmDeleteOpen(false)
+    setDeleteError(undefined)
+  }
+
+  function handleConfirmDelete() {
     deleteMutation.mutate(client!.id, {
       onSuccess: () => navigate('/clientes'),
+      onError: (error) => setDeleteError(error.message),
     })
   }
 
   const now = new Date()
-  const upcoming = appointments.filter(
-    (appointment) => appointment.start >= now,
-  )
+  const upcoming = appointments
+    .filter((appointment) => appointment.start >= now)
+    .sort((a, b) => a.start.getTime() - b.start.getTime())
   const past = appointments.filter((appointment) => appointment.start < now)
 
   return (
@@ -108,13 +129,13 @@ export function ClientDetailPage() {
             </div>
           </div>
           <div className="flex gap-1">
-            <IconButton
-              aria-label="Editar cliente"
-              onClick={() => setModalOpen(true)}
-            >
+            <IconButton aria-label="Editar cliente" onClick={openEditModal}>
               <Pencil className="size-4" aria-hidden="true" />
             </IconButton>
-            <IconButton aria-label="Excluir cliente" onClick={handleDelete}>
+            <IconButton
+              aria-label="Excluir cliente"
+              onClick={handleDeleteClick}
+            >
               <Trash2 className="text-danger-500 size-4" aria-hidden="true" />
             </IconButton>
           </div>
@@ -195,10 +216,21 @@ export function ClientDetailPage() {
 
       <ClientFormModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={closeEditModal}
         client={client}
         onSubmit={handleUpdate}
         isSubmitting={updateMutation.isPending}
+        error={submitError}
+      />
+
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        title="Excluir cliente"
+        description={`Excluir o cliente ${client.name}? Essa ação não pode ser desfeita.`}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        isLoading={deleteMutation.isPending}
+        error={deleteError}
       />
     </div>
   )

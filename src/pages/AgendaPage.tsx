@@ -175,6 +175,7 @@ export function AgendaPage() {
     if (modalState?.mode === 'edit') {
       deleteMutation.mutate(modalState.appointment.id, {
         onSuccess: closeModal,
+        onError: (error) => setSubmitError(error.message),
       })
     }
   }

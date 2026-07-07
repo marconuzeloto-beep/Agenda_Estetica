@@ -1,6 +1,6 @@
 import { Plus, Scissors } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Button, Spinner, Tabs } from '@/components/ui'
+import { Button, ConfirmDialog, Spinner, Tabs } from '@/components/ui'
 import { PageTransition } from '@/components/layout/PageTransition'
 import { ProcedureCard } from '@/features/procedures/components/ProcedureCard'
 import { ProcedureFormModal } from '@/features/procedures/components/ProcedureFormModal'
@@ -20,6 +20,9 @@ export function ProceduresPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>(ALL_CATEGORIES)
   const [modalOpen, setModalOpen] = useState(false)
   const [editingProcedure, setEditingProcedure] = useState<Procedure>()
+  const [submitError, setSubmitError] = useState<string>()
+  const [pendingDelete, setPendingDelete] = useState<Procedure>()
+  const [deleteError, setDeleteError] = useState<string>()
 
   const createMutation = useCreateProcedure()
   const updateMutation = useUpdateProcedure()
@@ -50,34 +53,55 @@ export function ProceduresPage() {
 
   function openCreateModal() {
     setEditingProcedure(undefined)
+    setSubmitError(undefined)
     setModalOpen(true)
   }
 
   function openEditModal(procedure: Procedure) {
     setEditingProcedure(procedure)
+    setSubmitError(undefined)
     setModalOpen(true)
   }
 
+  function closeModal() {
+    setModalOpen(false)
+    setSubmitError(undefined)
+  }
+
   function handleSubmit(values: ProcedureFormValues) {
+    setSubmitError(undefined)
     if (editingProcedure) {
       updateMutation.mutate(
         { id: editingProcedure.id, values },
-        { onSuccess: () => setModalOpen(false) },
+        {
+          onSuccess: closeModal,
+          onError: (error) => setSubmitError(error.message),
+        },
       )
     } else {
-      createMutation.mutate(values, { onSuccess: () => setModalOpen(false) })
+      createMutation.mutate(values, {
+        onSuccess: closeModal,
+        onError: (error) => setSubmitError(error.message),
+      })
     }
   }
 
-  function handleDelete(procedure: Procedure) {
-    if (
-      !window.confirm(
-        `Excluir o procedimento ${procedure.name}? Essa ação não pode ser desfeita.`,
-      )
-    ) {
-      return
-    }
-    deleteMutation.mutate(procedure.id)
+  function handleDeleteClick(procedure: Procedure) {
+    setDeleteError(undefined)
+    setPendingDelete(procedure)
+  }
+
+  function handleCancelDelete() {
+    setPendingDelete(undefined)
+    setDeleteError(undefined)
+  }
+
+  function handleConfirmDelete() {
+    if (!pendingDelete) return
+    deleteMutation.mutate(pendingDelete.id, {
+      onSuccess: () => setPendingDelete(undefined),
+      onError: (error) => setDeleteError(error.message),
+    })
   }
 
   return (
@@ -126,7 +150,7 @@ export function ProceduresPage() {
               key={procedure.id}
               procedure={procedure}
               onEdit={() => openEditModal(procedure)}
-              onDelete={() => handleDelete(procedure)}
+              onDelete={() => handleDeleteClick(procedure)}
             />
           ))}
         </div>
@@ -134,10 +158,21 @@ export function ProceduresPage() {
 
       <ProcedureFormModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={closeModal}
         procedure={editingProcedure}
         onSubmit={handleSubmit}
         isSubmitting={createMutation.isPending || updateMutation.isPending}
+        error={submitError}
+      />
+
+      <ConfirmDialog
+        open={pendingDelete !== undefined}
+        title="Excluir procedimento"
+        description={`Excluir o procedimento ${pendingDelete?.name}? Essa ação não pode ser desfeita.`}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        isLoading={deleteMutation.isPending}
+        error={deleteError}
       />
     </PageTransition>
   )
